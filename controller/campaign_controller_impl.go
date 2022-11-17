@@ -12,8 +12,38 @@ type CampaignControllerImpl struct {
 	service.CampaignService
 }
 
-func NewCampaignController(campaignService service.CampaignService) CampaignController {
-	return &CampaignControllerImpl{CampaignService: campaignService}
+func (contr *CampaignControllerImpl) CheckEmailAvailable(c *gin.Context) {
+	email := web.CheckEmailAvailable{}
+	err := c.ShouldBindJSON(&email)
+	if err != nil {
+		validationInput := helper.ErrorValidationInput(err, c)
+		response := helper.WriteToResponseBody(http.StatusUnprocessableEntity, "error input", "Email checking is failed", validationInput)
+		c.JSON(http.StatusUnprocessableEntity, &response)
+		return
+	}
+
+	emailAvailable, err := contr.CampaignService.CheckEmailAvailable(c, email)
+	if err != nil {
+		helper.ErrorCampaignService(err, c)
+	}
+
+	message := "Email is available"
+	if emailAvailable == false {
+		message = "Email has been registered"
+	}
+
+	data := gin.H{
+		"is_available": emailAvailable,
+	}
+
+	resp := helper.WriteToResponseBody(
+		200,
+		"success",
+		message,
+		data,
+	)
+
+	c.JSON(200, &resp)
 }
 
 func (contr *CampaignControllerImpl) RegisterUser(c *gin.Context) {
@@ -21,7 +51,9 @@ func (contr *CampaignControllerImpl) RegisterUser(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&user)
 	if err != nil {
-		helper.ErrorValidationInput(err, c)
+		validationInput := helper.ErrorValidationInput(err, c)
+		response := helper.WriteToResponseBody(http.StatusUnprocessableEntity, "error input", "Register account failed", validationInput)
+		c.JSON(http.StatusUnprocessableEntity, &response)
 		return
 	}
 
@@ -47,14 +79,15 @@ func (contr *CampaignControllerImpl) LoginUser(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&login)
 	if err != nil {
-		helper.ErrorValidationInput(err, c)
+		validationInput := helper.ErrorValidationInput(err, c)
+		response := helper.WriteToResponseBody(http.StatusUnprocessableEntity, "error input", "Login is failed", validationInput)
+		c.JSON(http.StatusUnprocessableEntity, &response)
 		return
 	}
 
 	user, err := contr.CampaignService.LoginUser(c, login)
 	if err != nil {
-		response := helper.WriteToResponseBody(http.StatusBadRequest, "BAD REQUEST", "Login is failed", err.Error())
-		c.JSON(http.StatusInternalServerError, &response)
+		helper.ErrorCampaignService(err, c)
 		return
 	}
 
@@ -66,4 +99,8 @@ func (contr *CampaignControllerImpl) LoginUser(c *gin.Context) {
 		userResponse)
 
 	c.JSON(200, response)
+}
+
+func NewCampaignController(campaignService service.CampaignService) CampaignController {
+	return &CampaignControllerImpl{CampaignService: campaignService}
 }

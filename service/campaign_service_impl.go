@@ -16,8 +16,20 @@ type CampaignServiceImpl struct {
 	*sql.DB
 }
 
-func NewCampaignService(campaignRepository repository.CampaignRepository, DB *sql.DB) CampaignService {
-	return &CampaignServiceImpl{CampaignRepository: campaignRepository, DB: DB}
+func (service *CampaignServiceImpl) CheckEmailAvailable(ctx context.Context, available web.CheckEmailAvailable) (bool, error) {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	email := available.Email
+
+	user, err := service.CampaignRepository.FindByEmail(ctx, tx, email)
+	helper.PanicIfError(err)
+
+	if user.Id == 0 {
+		return true, nil
+	}
+	return false, nil
 }
 
 func (service *CampaignServiceImpl) RegisterUser(ctx context.Context, user web.RegisterUser) (web.UserFiltered, error) {
@@ -63,4 +75,8 @@ func (service *CampaignServiceImpl) LoginUser(ctx context.Context, user web.Logi
 	}
 
 	return helper.UserFiltered(&findByEmail), nil
+}
+
+func NewCampaignService(campaignRepository repository.CampaignRepository, DB *sql.DB) CampaignService {
+	return &CampaignServiceImpl{CampaignRepository: campaignRepository, DB: DB}
 }

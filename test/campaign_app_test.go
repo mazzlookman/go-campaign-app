@@ -106,6 +106,13 @@ func TestCampaignServiceLoginUser(t *testing.T) {
 	assert.Equal(t, 5, user.Id)
 }
 
+func TestServiceCheckEmailAvailable(t *testing.T) {
+	emailAvailable, err := serv.CheckEmailAvailable(ctx, web.CheckEmailAvailable{Email: "up@test.com"})
+	helper.PanicIfError(err)
+
+	assert.Equal(t, false, emailAvailable)
+}
+
 //func TestRegisterUserController(t *testing.T) {
 //	payload := strings.NewReader(`{"name":"Teguh","occupation": "Data Analyst","email":"teguh@test.com","password":"password"}`)
 //	request := httptest.NewRequest("POST", addr+"/users", payload)

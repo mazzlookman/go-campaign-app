@@ -10,6 +10,7 @@ func NewRouter(controller controller.CampaignController) *gin.Engine {
 	group := router.Group("/api/v1")
 	group.POST("/users", controller.RegisterUser)
 	group.POST("/sessions", controller.LoginUser)
+	group.POST("/email-checker", controller.CheckEmailAvailable)
 
 	return router
 }

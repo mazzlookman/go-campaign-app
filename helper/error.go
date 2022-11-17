@@ -12,7 +12,7 @@ func PanicIfError(err error) {
 	}
 }
 
-func ErrorValidationInput(err error, c *gin.Context) {
+func ErrorValidationInput(err error, c *gin.Context) *gin.H {
 	var errors []string
 
 	for _, fieldError := range err.(validator.ValidationErrors) {
@@ -20,11 +20,11 @@ func ErrorValidationInput(err error, c *gin.Context) {
 	}
 
 	errorsMap := gin.H{"errors": errors}
-	response := WriteToResponseBody(http.StatusUnprocessableEntity, "error input", "Register account failed", errorsMap)
-	c.JSON(http.StatusUnprocessableEntity, &response)
+
+	return &errorsMap
 }
 
 func ErrorCampaignService(err error, c *gin.Context) {
-	response := WriteToResponseBody(http.StatusBadRequest, "BAD REQUEST", "Register account failed", err.Error())
+	response := WriteToResponseBody(http.StatusInternalServerError, "INTERNAL SERVER ERROR", "Ups sorry", err.Error())
 	c.JSON(http.StatusInternalServerError, &response)
 }
