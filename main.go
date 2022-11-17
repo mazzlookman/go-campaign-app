@@ -1,12 +1,8 @@
 package main
 
-import (
-	"github.com/gin-gonic/gin"
-	"go-campaign-app/test"
-)
+import "go-campaign-app/dependency_injection"
 
 func main() {
-	router := gin.Default()
-	router.GET("/handler", test.HandlerTest)
-	router.Run()
+	server := dependency_injection.InitializedServerTest()
+	server.Run(":2802")
 }
