@@ -25,6 +25,6 @@ func ErrorValidationInput(err error, c *gin.Context) {
 }
 
 func ErrorCampaignService(err error, c *gin.Context) {
-	response := WriteToResponseBody(http.StatusInternalServerError, "INTERNAL SERVER ERROR", "Register account failed", err.Error())
+	response := WriteToResponseBody(http.StatusBadRequest, "BAD REQUEST", "Register account failed", err.Error())
 	c.JSON(http.StatusInternalServerError, &response)
 }

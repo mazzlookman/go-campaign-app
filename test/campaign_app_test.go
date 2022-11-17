@@ -81,6 +81,31 @@ func TestCampaignServiceRegisterUser(t *testing.T) {
 	assert.Equal(t, user.Email, registerUser.Email)
 }
 
+func TestCampaignRepositoryFindByEmail(t *testing.T) {
+	tx, _ := db.Begin()
+	defer helper.CommitOrRollback(tx)
+
+	user, err := repo.FindByEmail(ctx, tx, "uup@test.com")
+	helper.PanicIfError(err)
+
+	fmt.Println(user)
+	assert.Equal(t, "", user.Occupation)
+}
+
+func TestCampaignServiceLoginUser(t *testing.T) {
+	tx, _ := db.Begin()
+	defer helper.CommitOrRollback(tx)
+
+	user, err := serv.LoginUser(ctx, web.LoginUser{
+		Email:    "ucup@test.com",
+		Password: "password",
+	})
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	assert.Equal(t, 5, user.Id)
+}
+
 //func TestRegisterUserController(t *testing.T) {
 //	payload := strings.NewReader(`{"name":"Teguh","occupation": "Data Analyst","email":"teguh@test.com","password":"password"}`)
 //	request := httptest.NewRequest("POST", addr+"/users", payload)

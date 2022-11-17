@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"go-campaign-app/helper"
 	"go-campaign-app/model/domain"
 	"go-campaign-app/model/web"
@@ -39,4 +40,27 @@ func (service *CampaignServiceImpl) RegisterUser(ctx context.Context, user web.R
 	}
 
 	return helper.UserFiltered(&save), nil
+}
+
+func (service *CampaignServiceImpl) LoginUser(ctx context.Context, user web.LoginUser) (web.UserFiltered, error) {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	email := user.Email
+	pass := user.Password
+
+	findByEmail, err := service.CampaignRepository.FindByEmail(ctx, tx, email)
+	helper.PanicIfError(err)
+
+	if findByEmail.Id == 0 {
+		return web.UserFiltered{}, errors.New("Account not found")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(findByEmail.PasswordHash), []byte(pass))
+	if err != nil {
+		return web.UserFiltered{}, errors.New("Your password is incorrect")
+	}
+
+	return helper.UserFiltered(&findByEmail), nil
 }

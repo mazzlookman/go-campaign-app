@@ -5,6 +5,7 @@ import (
 	"go-campaign-app/helper"
 	"go-campaign-app/model/web"
 	"go-campaign-app/service"
+	"net/http"
 )
 
 type CampaignControllerImpl struct {
@@ -39,4 +40,30 @@ func (contr *CampaignControllerImpl) RegisterUser(c *gin.Context) {
 		userResponse)
 
 	c.JSON(200, &apiResponse)
+}
+
+func (contr *CampaignControllerImpl) LoginUser(c *gin.Context) {
+	login := web.LoginUser{}
+
+	err := c.ShouldBindJSON(&login)
+	if err != nil {
+		helper.ErrorValidationInput(err, c)
+		return
+	}
+
+	user, err := contr.CampaignService.LoginUser(c, login)
+	if err != nil {
+		response := helper.WriteToResponseBody(http.StatusBadRequest, "BAD REQUEST", "Login is failed", err.Error())
+		c.JSON(http.StatusInternalServerError, &response)
+		return
+	}
+
+	userResponse := helper.UserResponseAPI(user, "tokentokentoken")
+	response := helper.WriteToResponseBody(
+		200,
+		"success",
+		"Login successfully",
+		userResponse)
+
+	c.JSON(200, response)
 }
