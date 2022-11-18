@@ -113,11 +113,12 @@ func TestServiceCheckEmailAvailable(t *testing.T) {
 	assert.Equal(t, false, emailAvailable)
 }
 
-//func TestRegisterUserController(t *testing.T) {
-//	payload := strings.NewReader(`{"name":"Teguh","occupation": "Data Analyst","email":"teguh@test.com","password":"password"}`)
-//	request := httptest.NewRequest("POST", addr+"/users", payload)
-//
-//	writer := httptest.NewRecorder()
-//
-//	http.Handler.ServeHTTP(contr.RegisterUser)
-//}
+func TestName(t *testing.T) {
+	fileName := "image/avatar4.jpg"
+	user, err := serv.UpdateAvatar(ctx, fileName, 1)
+	helper.PanicIfError(err)
+
+	fmt.Println(user)
+	assert.Equal(t, 1, user.Id)
+	assert.Equal(t, fileName, user.AvatarFileName)
+}

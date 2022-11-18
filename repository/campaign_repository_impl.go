@@ -10,8 +10,29 @@ import (
 type CampaignRepositoryImpl struct {
 }
 
-func NewCampaignRepository() CampaignRepository {
-	return &CampaignRepositoryImpl{}
+func (repo *CampaignRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (domain.User, error) {
+	sql := "select * from users where id = ?"
+	rows, err := tx.QueryContext(ctx, sql, id)
+	defer rows.Close()
+	helper.PanicIfError(err)
+
+	user := domain.User{}
+	if rows.Next() {
+		rows.Scan(
+			&user.Id, &user.Name, &user.Occupation, &user.Email, &user.PasswordHash, &user.AvatarFileName,
+			&user.Role, &user.CreatedAt, &user.UpdatedAt,
+		)
+	}
+
+	return user, nil
+}
+
+func (repo *CampaignRepositoryImpl) UpdateAvatar(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
+	sql := "update users set avatar = ? where id = ?"
+	_, err := tx.ExecContext(ctx, sql, user.AvatarFileName, user.Id)
+	helper.PanicIfError(err)
+
+	return user, nil
 }
 
 func (repo *CampaignRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
@@ -29,9 +50,9 @@ func (repo *CampaignRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, user d
 func (repo *CampaignRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.User, error) {
 	sql := "select * from users where email = ?"
 	rows, err := tx.QueryContext(ctx, sql, email)
-	if err != nil {
-		helper.PanicIfError(err)
-	}
+	defer rows.Close()
+	helper.PanicIfError(err)
+
 	user := domain.User{}
 	if rows.Next() {
 		rows.Scan(
@@ -39,6 +60,10 @@ func (repo *CampaignRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx,
 			&user.Role, &user.CreatedAt, &user.UpdatedAt,
 		)
 	}
+
 	return user, nil
 }
 
+func NewCampaignRepository() CampaignRepository {
+	return &CampaignRepositoryImpl{}
+}

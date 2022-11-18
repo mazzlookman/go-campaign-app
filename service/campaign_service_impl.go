@@ -16,6 +16,22 @@ type CampaignServiceImpl struct {
 	*sql.DB
 }
 
+func (service *CampaignServiceImpl) UpdateAvatar(ctx context.Context, fileName string, id int) (web.UserFiltered, error) {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	user, err := service.CampaignRepository.FindById(ctx, tx, id)
+	helper.PanicIfError(err)
+
+	user.AvatarFileName = fileName
+
+	avatar, err := service.CampaignRepository.UpdateAvatar(ctx, tx, user)
+	helper.PanicIfError(err)
+
+	return helper.UserFiltered(&avatar), nil
+}
+
 func (service *CampaignServiceImpl) CheckEmailAvailable(ctx context.Context, available web.CheckEmailAvailable) (bool, error) {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)

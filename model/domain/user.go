@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -11,7 +10,7 @@ type User struct {
 	Occupation     string
 	Email          string
 	PasswordHash   string
-	AvatarFileName sql.NullString
+	AvatarFileName string
 	Role           string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
