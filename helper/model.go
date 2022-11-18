@@ -11,7 +11,7 @@ func UserFiltered(user *domain.User) web.UserFiltered {
 	uf.Name = user.Name
 	uf.Occupation = user.Occupation
 	uf.Email = user.Email
-	uf.AvatarFileName = user.AvatarFileName
+	uf.AvatarFileName = user.AvatarFileName.String
 	uf.Role = user.Role
 
 	return uf

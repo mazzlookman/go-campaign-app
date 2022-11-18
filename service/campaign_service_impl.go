@@ -16,7 +16,7 @@ type CampaignServiceImpl struct {
 	*sql.DB
 }
 
-func (service *CampaignServiceImpl) UpdateAvatar(ctx context.Context, fileName string, id int) (web.UserFiltered, error) {
+func (service *CampaignServiceImpl) UploadAvatar(ctx context.Context, fileName string, id int) (web.UserFiltered, error) {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -24,9 +24,9 @@ func (service *CampaignServiceImpl) UpdateAvatar(ctx context.Context, fileName s
 	user, err := service.CampaignRepository.FindById(ctx, tx, id)
 	helper.PanicIfError(err)
 
-	user.AvatarFileName = fileName
+	user.AvatarFileName.String = fileName
 
-	avatar, err := service.CampaignRepository.UpdateAvatar(ctx, tx, user)
+	avatar, err := service.CampaignRepository.UploadAvatar(ctx, tx, user)
 	helper.PanicIfError(err)
 
 	return helper.UserFiltered(&avatar), nil

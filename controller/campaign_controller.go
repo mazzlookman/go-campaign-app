@@ -6,4 +6,5 @@ type CampaignController interface {
 	RegisterUser(c *gin.Context)
 	LoginUser(c *gin.Context)
 	CheckEmailAvailable(c *gin.Context)
+	UploadAvatar(c *gin.Context)
 }

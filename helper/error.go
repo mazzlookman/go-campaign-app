@@ -28,3 +28,9 @@ func ErrorCampaignService(err error, c *gin.Context) {
 	response := WriteToResponseBody(http.StatusInternalServerError, "INTERNAL SERVER ERROR", "Ups sorry", err.Error())
 	c.JSON(http.StatusInternalServerError, &response)
 }
+
+func ErrorUploadAvatar(err error, c *gin.Context, code int) {
+	data := gin.H{"is_uploaded": false}
+	response := WriteToResponseBody(code, "error", "Upload avatar is failed", data)
+	c.JSON(code, &response)
+}

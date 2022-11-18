@@ -113,8 +113,8 @@ func TestServiceCheckEmailAvailable(t *testing.T) {
 	assert.Equal(t, false, emailAvailable)
 }
 
-func TestName(t *testing.T) {
-	fileName := "image/avatar4.jpg"
+func TestNameServiceUpdateAvatar(t *testing.T) {
+	fileName := "image/avatar6.jpg"
 	user, err := serv.UpdateAvatar(ctx, fileName, 1)
 	helper.PanicIfError(err)
 

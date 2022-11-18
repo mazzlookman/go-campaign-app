@@ -27,9 +27,9 @@ func (repo *CampaignRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id
 	return user, nil
 }
 
-func (repo *CampaignRepositoryImpl) UpdateAvatar(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
+func (repo *CampaignRepositoryImpl) UploadAvatar(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
 	sql := "update users set avatar = ? where id = ?"
-	_, err := tx.ExecContext(ctx, sql, user.AvatarFileName, user.Id)
+	_, err := tx.ExecContext(ctx, sql, user.AvatarFileName.String, user.Id)
 	helper.PanicIfError(err)
 
 	return user, nil

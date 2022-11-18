@@ -11,6 +11,7 @@ func NewRouter(controller controller.CampaignController) *gin.Engine {
 	group.POST("/users", controller.RegisterUser)
 	group.POST("/sessions", controller.LoginUser)
 	group.POST("/email-checker", controller.CheckEmailAvailable)
+	group.POST("/avatars", controller.UploadAvatar)
 
 	return router
 }

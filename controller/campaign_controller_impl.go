@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-campaign-app/helper"
 	"go-campaign-app/model/web"
@@ -10,6 +11,31 @@ import (
 
 type CampaignControllerImpl struct {
 	service.CampaignService
+}
+
+func (contr *CampaignControllerImpl) UploadAvatar(c *gin.Context) {
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		helper.ErrorUploadAvatar(err, c, http.StatusUnprocessableEntity)
+		return
+	}
+	idUser := 1
+	dst := fmt.Sprintf("images/%d-%s", idUser, file.Filename)
+	err = c.SaveUploadedFile(file, dst)
+	if err != nil {
+		helper.ErrorUploadAvatar(err, c, http.StatusBadRequest)
+		return
+	}
+
+	_, err = contr.CampaignService.UploadAvatar(c, dst, idUser)
+	if err != nil {
+		helper.ErrorCampaignService(err, c)
+		return
+	}
+
+	data := gin.H{"is_uploaded": true}
+	response := helper.WriteToResponseBody(200, "success", "Avatar successfully uploaded", data)
+	c.JSON(200, &response)
 }
 
 func (contr *CampaignControllerImpl) CheckEmailAvailable(c *gin.Context) {
