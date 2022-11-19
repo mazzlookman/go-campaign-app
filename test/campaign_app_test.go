@@ -2,15 +2,21 @@ package test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"go-campaign-app/app"
 	"go-campaign-app/controller"
 	"go-campaign-app/helper"
+	"go-campaign-app/middleware"
 	"go-campaign-app/model/domain"
 	"go-campaign-app/model/web"
 	"go-campaign-app/repository"
 	"go-campaign-app/service"
+	"io"
+	"log"
+	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -18,7 +24,7 @@ var db = app.DBConnectionTest()
 var ctx = context.Background()
 var repo = repository.NewCampaignRepository()
 var serv = service.NewCampaignService(repo, db)
-var contr = controller.NewCampaignController(serv)
+var contr = controller.NewCampaignController(serv, middleware.NewJWTAuthImpl())
 
 //var addr = "http://localhost:8080/api/v1"
 
@@ -115,10 +121,41 @@ func TestServiceCheckEmailAvailable(t *testing.T) {
 
 func TestNameServiceUpdateAvatar(t *testing.T) {
 	fileName := "image/avatar6.jpg"
-	user, err := serv.UpdateAvatar(ctx, fileName, 1)
+	user, err := serv.UploadAvatar(ctx, fileName, 1)
 	helper.PanicIfError(err)
 
 	fmt.Println(user)
 	assert.Equal(t, 1, user.Id)
 	assert.Equal(t, fileName, user.AvatarFileName)
+}
+
+func TestGenerateToken(t *testing.T) {
+	var m = map[string]string{
+		"email":    "aqib@test.com",
+		"password": "password",
+	}
+	marshal, _ := json.Marshal(&m)
+
+	requ := httptest.NewRequest("POST", "http://localhost:2802/api/v1/sessions", strings.NewReader(string(marshal)))
+	writer := httptest.NewRecorder()
+
+	router := app.NewRouter(contr)
+	router.ServeHTTP(writer, requ)
+
+	response := writer.Result()
+	bytes, _ := io.ReadAll(response.Body)
+
+	fmt.Println(string(bytes))
+}
+
+func TestValidateToken(t *testing.T) {
+	jwtAuth := middleware.NewJWTAuthImpl()
+	token, err := jwtAuth.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.PnCL06cxJiB1R3cg17EAJAcXDnFwPU2QSp3lubIyQ_o")
+	helper.PanicIfError(err)
+
+	if token.Valid {
+		log.Println("token is validated")
+	} else {
+		log.Println("token not valid " + err.Error())
+	}
 }

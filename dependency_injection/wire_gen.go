@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-campaign-app/app"
 	"go-campaign-app/controller"
+	"go-campaign-app/middleware"
 	"go-campaign-app/repository"
 	"go-campaign-app/service"
 )
@@ -20,7 +21,8 @@ func InitializedServer() *gin.Engine {
 	campaignRepository := repository.NewCampaignRepository()
 	db := app.DBConnection()
 	campaignService := service.NewCampaignService(campaignRepository, db)
-	campaignController := controller.NewCampaignController(campaignService)
+	jwtAuth := middleware.NewJWTAuthImpl()
+	campaignController := controller.NewCampaignController(campaignService, jwtAuth)
 	engine := app.NewRouter(campaignController)
 	return engine
 }
@@ -29,7 +31,8 @@ func InitializedServerTest() *gin.Engine {
 	campaignRepository := repository.NewCampaignRepository()
 	db := app.DBConnectionTest()
 	campaignService := service.NewCampaignService(campaignRepository, db)
-	campaignController := controller.NewCampaignController(campaignService)
+	jwtAuth := middleware.NewJWTAuthImpl()
+	campaignController := controller.NewCampaignController(campaignService, jwtAuth)
 	engine := app.NewRouter(campaignController)
 	return engine
 }

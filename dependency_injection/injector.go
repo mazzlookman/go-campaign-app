@@ -8,35 +8,17 @@ import (
 	"github.com/google/wire"
 	"go-campaign-app/app"
 	"go-campaign-app/controller"
+	"go-campaign-app/middleware"
 	"go-campaign-app/repository"
 	"go-campaign-app/service"
 )
-
-//
-//func InitializedCampaignServiceTest() *service.CampaignServiceImpl {
-//	wire.Build(
-//		app.DBConnectionTest,
-//		repository.NewCampaignRepository,
-//		service.NewCampaignService,
-//	)
-//	return nil
-//}
-//
-////func InitializedCampaignControllerTest() *controller.CampaignControllerImpl {
-////	wire.Build(
-////		app.DBConnectionTest,
-////		repository.NewCampaignRepository,
-////		service.NewCampaignService,
-////		controller.NewCampaignController,
-////	)
-////	return nil
-////}
 
 func InitializedServer() *gin.Engine {
 	wire.Build(
 		app.DBConnection,
 		repository.NewCampaignRepository,
 		service.NewCampaignService,
+		middleware.NewJWTAuthImpl,
 		controller.NewCampaignController,
 		app.NewRouter,
 	)
@@ -48,6 +30,7 @@ func InitializedServerTest() *gin.Engine {
 		app.DBConnectionTest,
 		repository.NewCampaignRepository,
 		service.NewCampaignService,
+		middleware.NewJWTAuthImpl,
 		controller.NewCampaignController,
 		app.NewRouter,
 	)

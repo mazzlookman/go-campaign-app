@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-campaign-app/helper"
+	"go-campaign-app/middleware"
 	"go-campaign-app/model/web"
 	"go-campaign-app/service"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 
 type CampaignControllerImpl struct {
 	service.CampaignService
+	middleware.JWTAuth
 }
 
 func (contr *CampaignControllerImpl) UploadAvatar(c *gin.Context) {
@@ -89,7 +91,10 @@ func (contr *CampaignControllerImpl) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	userResponse := helper.UserResponseAPI(registerUser, "tokentokentokentoken")
+	token, err := contr.JWTAuth.GenerateToken(registerUser.Id)
+	helper.PanicIfError(err)
+
+	userResponse := helper.UserResponseAPI(registerUser, token)
 
 	apiResponse := helper.WriteToResponseBody(
 		200,
@@ -117,7 +122,10 @@ func (contr *CampaignControllerImpl) LoginUser(c *gin.Context) {
 		return
 	}
 
-	userResponse := helper.UserResponseAPI(user, "tokentokentoken")
+	token, err := contr.JWTAuth.GenerateToken(user.Id)
+	helper.PanicIfError(err)
+
+	userResponse := helper.UserResponseAPI(user, token)
 	response := helper.WriteToResponseBody(
 		200,
 		"success",
@@ -127,6 +135,9 @@ func (contr *CampaignControllerImpl) LoginUser(c *gin.Context) {
 	c.JSON(200, response)
 }
 
-func NewCampaignController(campaignService service.CampaignService) CampaignController {
-	return &CampaignControllerImpl{CampaignService: campaignService}
+func NewCampaignController(campaignService service.CampaignService, auth middleware.JWTAuth) CampaignController {
+	return &CampaignControllerImpl{
+		CampaignService: campaignService,
+		JWTAuth:         auth,
+	}
 }

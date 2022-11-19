@@ -11,7 +11,7 @@ type APIResponse struct {
 	Data interface{} `json:"data"`
 }
 
-type RegisterUserResponse struct {
+type RegisterOrLoginUserResponse struct {
 	Id         int    `json:"id"`
 	Name       string `json:"name"`
 	Occupation string `json:"occupation"`
