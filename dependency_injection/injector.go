@@ -36,3 +36,14 @@ func InitializedServerTest() *gin.Engine {
 	)
 	return nil
 }
+
+func InitializedJwtAuthMiddleware() gin.HandlerFunc {
+	wire.Build(
+		app.DBConnectionTest,
+		repository.NewCampaignRepository,
+		service.NewCampaignService,
+		middleware.NewJWTAuthImpl,
+		middleware.NewJWTAuthMiddleware,
+	)
+	return nil
+}
