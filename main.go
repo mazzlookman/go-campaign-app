@@ -1,8 +1,10 @@
 package main
 
-import "go-campaign-app/dependency_injection"
+import (
+	"go-campaign-app/app"
+)
 
 func main() {
-	server := dependency_injection.InitializedServerTest()
+	server := app.NewRouter()
 	server.Run(":2802")
 }

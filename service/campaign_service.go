@@ -10,4 +10,5 @@ type CampaignService interface {
 	LoginUser(ctx context.Context, user web.LoginUser) (web.UserFiltered, error)
 	CheckEmailAvailable(ctx context.Context, available web.CheckEmailAvailable) (bool, error)
 	UploadAvatar(ctx context.Context, fileName string, id int) (web.UserFiltered, error)
+	FindById(ctx context.Context, id int) (web.UserFiltered, error)
 }

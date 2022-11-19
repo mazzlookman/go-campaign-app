@@ -34,3 +34,8 @@ func ErrorUploadAvatar(err error, c *gin.Context, code int) {
 	response := WriteToResponseBody(code, "error", "Upload avatar is failed", data)
 	c.JSON(code, &response)
 }
+
+func ErrorUnauthorized(c *gin.Context, code int) {
+	response := WriteToResponseBody(code, "error", "UNAUTHORIZED", nil)
+	c.AbortWithStatusJSON(code, &response)
+}

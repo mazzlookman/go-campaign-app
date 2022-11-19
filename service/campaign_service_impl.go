@@ -16,6 +16,17 @@ type CampaignServiceImpl struct {
 	*sql.DB
 }
 
+func (service *CampaignServiceImpl) FindById(ctx context.Context, id int) (web.UserFiltered, error) {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	user, err := service.CampaignRepository.FindById(ctx, tx, id)
+	helper.PanicIfError(err)
+
+	return helper.UserFiltered(&user), nil
+}
+
 func (service *CampaignServiceImpl) UploadAvatar(ctx context.Context, fileName string, id int) (web.UserFiltered, error) {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)

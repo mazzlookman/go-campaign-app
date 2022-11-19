@@ -27,7 +27,10 @@ func (auth *JWTAuthImpl) ValidateToken(token string) (*jwt.Token, error) {
 			return key, nil
 		})
 
-	helper.PanicIfError(err)
+	if err != nil {
+		return nil, err
+	}
+
 	return parse, nil
 }
 

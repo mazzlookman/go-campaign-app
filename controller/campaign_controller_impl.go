@@ -21,7 +21,8 @@ func (contr *CampaignControllerImpl) UploadAvatar(c *gin.Context) {
 		helper.ErrorUploadAvatar(err, c, http.StatusUnprocessableEntity)
 		return
 	}
-	idUser := 1
+	idUser := c.MustGet("currentUser").(int)
+
 	dst := fmt.Sprintf("images/%d-%s", idUser, file.Filename)
 	err = c.SaveUploadedFile(file, dst)
 	if err != nil {
