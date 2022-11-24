@@ -10,10 +10,10 @@ import (
 
 func NewRouter() *gin.Engine {
 	db := DBConnectionTest()
-	repo := repository.NewCampaignRepository()
-	serv := service.NewCampaignService(repo, db)
+	repo := repository.NewUserRepository()
+	serv := service.NewUserService(repo, db)
 	jwtAuth := middleware.NewJWTAuthImpl()
-	contr := controller.NewCampaignController(serv, jwtAuth)
+	contr := controller.NewUserController(serv, jwtAuth)
 	jwtAuthMiddleware := middleware.NewJWTAuthMiddleware(jwtAuth, serv)
 
 	router := gin.Default()

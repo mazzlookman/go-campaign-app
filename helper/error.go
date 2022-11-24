@@ -24,7 +24,7 @@ func ErrorValidationInput(err error, c *gin.Context) *gin.H {
 	return &errorsMap
 }
 
-func ErrorCampaignService(err error, c *gin.Context) {
+func ErrorUserService(err error, c *gin.Context) {
 	response := WriteToResponseBody(http.StatusInternalServerError, "INTERNAL SERVER ERROR", "Ups sorry", err.Error())
 	c.JSON(http.StatusInternalServerError, &response)
 }

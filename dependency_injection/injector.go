@@ -16,10 +16,10 @@ import (
 func InitializedServer() *gin.Engine {
 	wire.Build(
 		app.DBConnection,
-		repository.NewCampaignRepository,
-		service.NewCampaignService,
+		repository.NewUserRepository,
+		service.NewUserService,
 		middleware.NewJWTAuthImpl,
-		controller.NewCampaignController,
+		controller.NewUserController,
 		app.NewRouter,
 	)
 	return nil
@@ -28,10 +28,10 @@ func InitializedServer() *gin.Engine {
 func InitializedServerTest() *gin.Engine {
 	wire.Build(
 		app.DBConnectionTest,
-		repository.NewCampaignRepository,
-		service.NewCampaignService,
+		repository.NewUserRepository,
+		service.NewUserService,
 		middleware.NewJWTAuthImpl,
-		controller.NewCampaignController,
+		controller.NewUserController,
 		app.NewRouter,
 	)
 	return nil
@@ -40,8 +40,8 @@ func InitializedServerTest() *gin.Engine {
 func InitializedJwtAuthMiddleware() gin.HandlerFunc {
 	wire.Build(
 		app.DBConnectionTest,
-		repository.NewCampaignRepository,
-		service.NewCampaignService,
+		repository.NewUserRepository,
+		service.NewUserService,
 		middleware.NewJWTAuthImpl,
 		middleware.NewJWTAuthMiddleware,
 	)

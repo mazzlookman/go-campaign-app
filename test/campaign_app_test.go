@@ -22,9 +22,9 @@ import (
 
 var db = app.DBConnectionTest()
 var ctx = context.Background()
-var repo = repository.NewCampaignRepository()
-var serv = service.NewCampaignService(repo, db)
-var contr = controller.NewCampaignController(serv, middleware.NewJWTAuthImpl())
+var repo = repository.NewUserRepository()
+var serv = service.NewUserService(repo, db)
+var contr = controller.NewUserController(serv, middleware.NewJWTAuthImpl())
 
 //var addr = "http://localhost:8080/api/v1"
 

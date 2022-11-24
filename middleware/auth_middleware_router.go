@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func NewJWTAuthMiddleware(auth JWTAuth, service service.CampaignService) gin.HandlerFunc {
+func NewJWTAuthMiddleware(auth JWTAuth, service service.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
 		if !strings.Contains(header, "Hii") {
