@@ -139,7 +139,7 @@ func TestGenerateToken(t *testing.T) {
 	requ := httptest.NewRequest("POST", "http://localhost:2802/api/v1/sessions", strings.NewReader(string(marshal)))
 	writer := httptest.NewRecorder()
 
-	router := app.NewRouter(contr)
+	router := app.NewRouter()
 	router.ServeHTTP(writer, requ)
 
 	response := writer.Result()

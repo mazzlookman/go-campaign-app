@@ -1,10 +1,17 @@
 package helper
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"net/http"
 )
+
+func CampaignRepositoryError(err error) {
+	if err != nil {
+		panic(errors.New("Ups. Campaign Repository Error " + err.Error()))
+	}
+}
 
 func PanicIfError(err error) {
 	if err != nil {

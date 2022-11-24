@@ -9,7 +9,7 @@ import (
 )
 
 func NewRouter() *gin.Engine {
-	db := DBConnectionTest()
+	db := DBConnection()
 	repo := repository.NewUserRepository()
 	serv := service.NewUserService(repo, db)
 	jwtAuth := middleware.NewJWTAuthImpl()
