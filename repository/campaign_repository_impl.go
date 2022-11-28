@@ -12,10 +12,8 @@ type CampaignRepositoryImpl struct {
 func (repo *CampaignRepositoryImpl) FindAll(db *gorm.DB) ([]domain.Campaign, error) {
 	var campaigns []domain.Campaign
 	err := db.Preload("CampaignImages", "campaign_images.is_primary=1").Find(&campaigns).Error
-	if err != nil {
-		helper.CampaignRepositoryError(err)
-		return campaigns, err
-	}
+	helper.CampaignRepositoryError(err)
+
 	return campaigns, nil
 }
 
@@ -26,10 +24,7 @@ func (repo *CampaignRepositoryImpl) FindByUserId(db *gorm.DB, userId int) ([]dom
 		Find(&campaigns).
 		Error
 
-	if err != nil {
-		helper.CampaignRepositoryError(err)
-		return campaigns, err
-	}
+	helper.CampaignRepositoryError(err)
 
 	return campaigns, nil
 }

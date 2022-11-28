@@ -25,6 +25,12 @@ func UserServiceError(err error) {
 	}
 }
 
+func CampaignServiceError(err error) {
+	if err != nil {
+		panic(errors.New("Ups. Campaign Service Error " + err.Error()))
+	}
+}
+
 func PanicIfError(err error) {
 	if err != nil {
 		panic(err)

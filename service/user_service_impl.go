@@ -17,27 +17,19 @@ type UserServiceImpl struct {
 
 func (service *UserServiceImpl) FindById(id int) (web.UserFiltered, error) {
 	user, err := service.UserRepository.FindById(service.DB, id)
-	if err != nil {
-		helper.UserServiceError(err)
-	}
+	helper.UserServiceError(err)
 
 	return helper.UserFiltered(&user), nil
 }
 
 func (service *UserServiceImpl) UploadAvatar(fileName string, id int) (web.UserFiltered, error) {
 	user, err := service.UserRepository.FindById(service.DB, id)
-	if err != nil {
-		helper.UserServiceError(err)
-		return web.UserFiltered{}, err
-	}
+	helper.UserServiceError(err)
 
 	user.AvatarFileName.String = fileName
 
 	avatar, err := service.UserRepository.UploadAvatar(service.DB, user)
-	if err != nil {
-		helper.UserServiceError(err)
-		return web.UserFiltered{}, err
-	}
+	helper.UserServiceError(err)
 
 	return helper.UserFiltered(&avatar), nil
 }
@@ -46,10 +38,7 @@ func (service *UserServiceImpl) CheckEmailAvailable(available web.CheckEmailAvai
 	email := available.Email
 
 	user, err := service.UserRepository.FindByEmail(service.DB, email)
-	if err != nil {
-		helper.UserServiceError(err)
-		return false, err
-	}
+	helper.UserServiceError(err)
 
 	if user.Id == 0 {
 		return true, nil
@@ -66,12 +55,8 @@ func (service *UserServiceImpl) RegisterUser(user web.RegisterUser) (web.UserFil
 	helper.PanicIfError(err)
 	userRepo.PasswordHash = string(password)
 	userRepo.Role = "user"
-
 	save, err := service.UserRepository.Save(service.DB, userRepo)
-	if err != nil {
-		helper.UserServiceError(err)
-		return web.UserFiltered{}, err
-	}
+	helper.UserServiceError(err)
 
 	return helper.UserFiltered(&save), nil
 }
@@ -81,9 +66,7 @@ func (service *UserServiceImpl) LoginUser(user web.LoginUser) (web.UserFiltered,
 	pass := user.Password
 
 	findByEmail, err := service.UserRepository.FindByEmail(service.DB, email)
-	if err != nil {
-		helper.UserServiceError(err)
-	}
+	helper.UserServiceError(err)
 
 	if findByEmail.Id == 0 {
 		return web.UserFiltered{}, errors.New("Account not found")
