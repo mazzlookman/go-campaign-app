@@ -7,9 +7,21 @@ import (
 	"net/http"
 )
 
+func UserRepositoryError(err error) {
+	if err != nil {
+		panic(errors.New("Ups. User Repository Error " + err.Error()))
+	}
+}
+
 func CampaignRepositoryError(err error) {
 	if err != nil {
 		panic(errors.New("Ups. Campaign Repository Error " + err.Error()))
+	}
+}
+
+func UserServiceError(err error) {
+	if err != nil {
+		panic(errors.New("Ups. User Service Error " + err.Error()))
 	}
 }
 

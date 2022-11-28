@@ -30,7 +30,7 @@ func (contr *UserControllerImpl) UploadAvatar(c *gin.Context) {
 		return
 	}
 
-	_, err = contr.UserService.UploadAvatar(c, dst, idUser)
+	_, err = contr.UserService.UploadAvatar(dst, idUser)
 	if err != nil {
 		helper.ErrorUserService(err, c)
 		return
@@ -51,7 +51,7 @@ func (contr *UserControllerImpl) CheckEmailAvailable(c *gin.Context) {
 		return
 	}
 
-	emailAvailable, err := contr.UserService.CheckEmailAvailable(c, email)
+	emailAvailable, err := contr.UserService.CheckEmailAvailable(email)
 	if err != nil {
 		helper.ErrorUserService(err, c)
 	}
@@ -86,7 +86,7 @@ func (contr *UserControllerImpl) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	registerUser, err := contr.UserService.RegisterUser(c, user)
+	registerUser, err := contr.UserService.RegisterUser(user)
 	if err != nil {
 		helper.ErrorUserService(err, c)
 		return
@@ -117,7 +117,7 @@ func (contr *UserControllerImpl) LoginUser(c *gin.Context) {
 		return
 	}
 
-	user, err := contr.UserService.LoginUser(c, login)
+	user, err := contr.UserService.LoginUser(login)
 	if err != nil {
 		helper.ErrorUserService(err, c)
 		return

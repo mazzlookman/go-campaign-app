@@ -34,7 +34,7 @@ func NewJWTAuthMiddleware(auth JWTAuth, service service.UserService) gin.Handler
 
 		userId := int(claim["user_id"].(float64))
 
-		findById, err := service.FindById(c, userId)
+		findById, err := service.FindById(userId)
 		if err != nil {
 			helper.ErrorUnauthorized(c, http.StatusUnauthorized)
 			return

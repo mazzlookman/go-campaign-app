@@ -1,8 +1,6 @@
 package test
 
 import (
-	"context"
-	"database/sql"
 	"fmt"
 	"go-campaign-app/app"
 	"go-campaign-app/helper"
@@ -10,17 +8,17 @@ import (
 	"testing"
 )
 
-func dbContext() (*sql.DB, context.Context) {
-	d := app.DBConnection()
-	c := context.Background()
-	return d, c
-}
-
 func TestFindAllCampaign(t *testing.T) {
-	d, c := dbContext()
-	tx, _ := d.Begin()
+	d := app.DBConnection()
 	r := repository.NewCampaignRepository()
-	campaigns, err := r.FindAll(c, tx)
+	campaigns, err := r.FindByUserId(d, 1)
 	helper.PanicIfError(err)
-	fmt.Println(campaigns)
+	fmt.Println(len(campaigns))
+	for _, campaign := range campaigns {
+		fmt.Println(campaign.Name)
+		if len(campaign.CampaignImages) > 0 {
+			fmt.Println(campaign.CampaignImages[0].FileName)
+		}
+		fmt.Println("==================")
+	}
 }

@@ -1,57 +1,55 @@
 package service
 
 import (
-	"context"
-	"database/sql"
 	"errors"
 	"go-campaign-app/helper"
 	"go-campaign-app/model/domain"
 	"go-campaign-app/model/web"
 	"go-campaign-app/repository"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type UserServiceImpl struct {
 	repository.UserRepository
-	*sql.DB
+	*gorm.DB
 }
 
-func (service *UserServiceImpl) FindById(ctx context.Context, id int) (web.UserFiltered, error) {
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	user, err := service.UserRepository.FindById(ctx, tx, id)
-	helper.PanicIfError(err)
+func (service *UserServiceImpl) FindById(id int) (web.UserFiltered, error) {
+	user, err := service.UserRepository.FindById(service.DB, id)
+	if err != nil {
+		helper.UserServiceError(err)
+	}
 
 	return helper.UserFiltered(&user), nil
 }
 
-func (service *UserServiceImpl) UploadAvatar(ctx context.Context, fileName string, id int) (web.UserFiltered, error) {
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	user, err := service.UserRepository.FindById(ctx, tx, id)
-	helper.PanicIfError(err)
+func (service *UserServiceImpl) UploadAvatar(fileName string, id int) (web.UserFiltered, error) {
+	user, err := service.UserRepository.FindById(service.DB, id)
+	if err != nil {
+		helper.UserServiceError(err)
+		return web.UserFiltered{}, err
+	}
 
 	user.AvatarFileName.String = fileName
 
-	avatar, err := service.UserRepository.UploadAvatar(ctx, tx, user)
-	helper.PanicIfError(err)
+	avatar, err := service.UserRepository.UploadAvatar(service.DB, user)
+	if err != nil {
+		helper.UserServiceError(err)
+		return web.UserFiltered{}, err
+	}
 
 	return helper.UserFiltered(&avatar), nil
 }
 
-func (service *UserServiceImpl) CheckEmailAvailable(ctx context.Context, available web.CheckEmailAvailable) (bool, error) {
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
+func (service *UserServiceImpl) CheckEmailAvailable(available web.CheckEmailAvailable) (bool, error) {
 	email := available.Email
 
-	user, err := service.UserRepository.FindByEmail(ctx, tx, email)
-	helper.PanicIfError(err)
+	user, err := service.UserRepository.FindByEmail(service.DB, email)
+	if err != nil {
+		helper.UserServiceError(err)
+		return false, err
+	}
 
 	if user.Id == 0 {
 		return true, nil
@@ -59,11 +57,7 @@ func (service *UserServiceImpl) CheckEmailAvailable(ctx context.Context, availab
 	return false, nil
 }
 
-func (service *UserServiceImpl) RegisterUser(ctx context.Context, user web.RegisterUser) (web.UserFiltered, error) {
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
+func (service *UserServiceImpl) RegisterUser(user web.RegisterUser) (web.UserFiltered, error) {
 	userRepo := domain.User{}
 	userRepo.Name = user.Name
 	userRepo.Occupation = user.Occupation
@@ -73,24 +67,23 @@ func (service *UserServiceImpl) RegisterUser(ctx context.Context, user web.Regis
 	userRepo.PasswordHash = string(password)
 	userRepo.Role = "user"
 
-	save, err := service.UserRepository.Save(ctx, tx, userRepo)
+	save, err := service.UserRepository.Save(service.DB, userRepo)
 	if err != nil {
-		return helper.UserFiltered(&save), err
+		helper.UserServiceError(err)
+		return web.UserFiltered{}, err
 	}
 
 	return helper.UserFiltered(&save), nil
 }
 
-func (service *UserServiceImpl) LoginUser(ctx context.Context, user web.LoginUser) (web.UserFiltered, error) {
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
+func (service *UserServiceImpl) LoginUser(user web.LoginUser) (web.UserFiltered, error) {
 	email := user.Email
 	pass := user.Password
 
-	findByEmail, err := service.UserRepository.FindByEmail(ctx, tx, email)
-	helper.PanicIfError(err)
+	findByEmail, err := service.UserRepository.FindByEmail(service.DB, email)
+	if err != nil {
+		helper.UserServiceError(err)
+	}
 
 	if findByEmail.Id == 0 {
 		return web.UserFiltered{}, errors.New("Account not found")
@@ -104,6 +97,6 @@ func (service *UserServiceImpl) LoginUser(ctx context.Context, user web.LoginUse
 	return helper.UserFiltered(&findByEmail), nil
 }
 
-func NewUserService(campaignRepository repository.UserRepository, DB *sql.DB) UserService {
+func NewUserService(campaignRepository repository.UserRepository, DB *gorm.DB) UserService {
 	return &UserServiceImpl{UserRepository: campaignRepository, DB: DB}
 }

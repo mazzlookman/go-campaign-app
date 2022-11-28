@@ -1,18 +1,14 @@
 package repository
 
 import (
-	"context"
-	"database/sql"
 	"go-campaign-app/model/domain"
+	"gorm.io/gorm"
 )
 
 type UserRepository interface {
 	//User Repository
-	Save(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error)
-	FindByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.User, error)
-	FindById(ctx context.Context, tx *sql.Tx, id int) (domain.User, error)
-	UploadAvatar(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error)
-
-	//Campaign Repository
-
+	Save(db *gorm.DB, user domain.User) (domain.User, error)
+	FindByEmail(db *gorm.DB, email string) (domain.User, error)
+	FindById(db *gorm.DB, id int) (domain.User, error)
+	UploadAvatar(db *gorm.DB, user domain.User) (domain.User, error)
 }

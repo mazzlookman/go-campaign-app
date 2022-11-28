@@ -1,64 +1,49 @@
 package repository
 
 import (
-	"context"
-	"database/sql"
 	"go-campaign-app/helper"
 	"go-campaign-app/model/domain"
+	"gorm.io/gorm"
 )
 
 type UserRepositoryImpl struct {
 }
 
-func (repo *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (domain.User, error) {
-	sql := "select * from users where id = ?"
-	rows, err := tx.QueryContext(ctx, sql, id)
-	defer rows.Close()
-	helper.PanicIfError(err)
-
+func (repo *UserRepositoryImpl) FindById(db *gorm.DB, id int) (domain.User, error) {
 	user := domain.User{}
-	if rows.Next() {
-		rows.Scan(
-			&user.Id, &user.Name, &user.Occupation, &user.Email, &user.PasswordHash, &user.AvatarFileName,
-			&user.Role, &user.CreatedAt, &user.UpdatedAt,
-		)
-	}
-
-	return user, nil
-}
-
-func (repo *UserRepositoryImpl) UploadAvatar(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
-	sql := "update users set avatar = ? where id = ?"
-	_, err := tx.ExecContext(ctx, sql, user.AvatarFileName.String, user.Id)
-	helper.PanicIfError(err)
-
-	return user, nil
-}
-
-func (repo *UserRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
-	sql := "insert into users (name,occupation,email,password_hash,avatar,role) values (?,?,?,?,?,?)"
-	result, err := tx.ExecContext(ctx, sql, user.Name, user.Occupation, user.Email, user.PasswordHash, user.AvatarFileName, user.Role)
+	err := db.Where("id = ?", id).Find(&user).Error
 	if err != nil {
+		helper.UserRepositoryError(err)
 		return user, err
 	}
-	id, _ := result.LastInsertId()
-	user.Id = int(id)
 
 	return user, nil
 }
 
-func (repo *UserRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.User, error) {
-	sql := "select * from users where email = ?"
-	rows, err := tx.QueryContext(ctx, sql, email)
-	defer rows.Close()
-	helper.PanicIfError(err)
+func (repo *UserRepositoryImpl) UploadAvatar(db *gorm.DB, user domain.User) (domain.User, error) {
+	err := db.Save(&user).Where("id", user.Id).Error
+	if err != nil {
+		helper.UserRepositoryError(err)
+		return user, err
+	}
+	return user, nil
+}
 
+func (repo *UserRepositoryImpl) Save(db *gorm.DB, user domain.User) (domain.User, error) {
+	err := db.Create(&user).Error
+	if err != nil {
+		helper.UserRepositoryError(err)
+		return user, err
+	}
+	return user, nil
+}
+
+func (repo *UserRepositoryImpl) FindByEmail(db *gorm.DB, email string) (domain.User, error) {
 	user := domain.User{}
-	if rows.Next() {
-		rows.Scan(
-			&user.Id, &user.Name, &user.Occupation, &user.Email, &user.PasswordHash, &user.AvatarFileName,
-			&user.Role, &user.CreatedAt, &user.UpdatedAt,
-		)
+	err := db.Where("email=?", email).Find(&user).Error
+	if err != nil {
+		helper.UserRepositoryError(err)
+		return user, err
 	}
 
 	return user, nil
