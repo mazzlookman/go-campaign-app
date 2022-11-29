@@ -10,18 +10,29 @@ import (
 
 func NewRouter() *gin.Engine {
 	db := DBConnection()
-	repo := repository.NewUserRepository()
-	serv := service.NewUserService(repo, db)
+
+	repoUser := repository.NewUserRepository()
+	repoCampaign := repository.NewCampaignRepository()
+
+	servUser := service.NewUserService(repoUser, db)
+	servCampaign := service.NewCampaignService(repoCampaign, db)
+
 	jwtAuth := middleware.NewJWTAuthImpl()
-	contr := controller.NewUserController(serv, jwtAuth)
-	jwtAuthMiddleware := middleware.NewJWTAuthMiddleware(jwtAuth, serv)
+	jwtAuthMiddleware := middleware.NewJWTAuthMiddleware(jwtAuth, servUser)
+
+	contrUser := controller.NewUserController(servUser, jwtAuth)
+	contrCampaign := controller.NewCampaignControllerImpl(servCampaign)
 
 	router := gin.Default()
+	//User endpoint
 	group := router.Group("/api/v1")
-	group.POST("/users", contr.RegisterUser)
-	group.POST("/sessions", contr.LoginUser)
-	group.POST("/email-checker", contr.CheckEmailAvailable)
-	group.POST("/avatars", jwtAuthMiddleware, contr.UploadAvatar)
+	group.POST("/users", contrUser.RegisterUser)
+	group.POST("/sessions", contrUser.LoginUser)
+	group.POST("/email-checker", contrUser.CheckEmailAvailable)
+	group.POST("/avatars", jwtAuthMiddleware, contrUser.UploadAvatar)
+
+	//Campaign endpoint
+	group.GET("/campaigns", contrCampaign.FindCampaigns)
 
 	return router
 }
