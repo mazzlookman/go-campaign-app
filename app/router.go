@@ -24,15 +24,18 @@ func NewRouter() *gin.Engine {
 	contrCampaign := controller.NewCampaignControllerImpl(servCampaign)
 
 	router := gin.Default()
+	router.Static("/images", "./images")
+
 	//User endpoint
-	group := router.Group("/api/v1")
-	group.POST("/users", contrUser.RegisterUser)
-	group.POST("/sessions", contrUser.LoginUser)
-	group.POST("/email-checker", contrUser.CheckEmailAvailable)
-	group.POST("/avatars", jwtAuthMiddleware, contrUser.UploadAvatar)
+	api := router.Group("/api/v1")
+	api.POST("/users", contrUser.RegisterUser)
+	api.POST("/sessions", contrUser.LoginUser)
+	api.POST("/email-checker", contrUser.CheckEmailAvailable)
+	api.POST("/avatars", jwtAuthMiddleware, contrUser.UploadAvatar)
 
 	//Campaign endpoint
-	group.GET("/campaigns", contrCampaign.FindCampaigns)
+	api.GET("/campaigns", contrCampaign.FindCampaigns)
+	api.GET("/campaigns/:campaignId", contrCampaign.FindCampaignById)
 
 	return router
 }

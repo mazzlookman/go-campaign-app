@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go-campaign-app/formatter"
 	"go-campaign-app/helper"
 	"go-campaign-app/middleware"
 	"go-campaign-app/model/web"
@@ -37,7 +38,7 @@ func (contr *UserControllerImpl) UploadAvatar(c *gin.Context) {
 	}
 
 	data := gin.H{"is_uploaded": true}
-	response := helper.WriteToResponseBody(200, "success", "Avatar successfully uploaded", data)
+	response := formatter.WriteToResponseBody(200, "success", "Avatar successfully uploaded", data)
 	c.JSON(200, &response)
 }
 
@@ -45,8 +46,8 @@ func (contr *UserControllerImpl) CheckEmailAvailable(c *gin.Context) {
 	email := web.CheckEmailAvailable{}
 	err := c.ShouldBindJSON(&email)
 	if err != nil {
-		validationInput := helper.ErrorValidationInput(err, c)
-		response := helper.WriteToResponseBody(http.StatusUnprocessableEntity, "error input", "Email checking is failed", validationInput)
+		validationInput := helper.ErrorValidationInput(err)
+		response := formatter.WriteToResponseBody(http.StatusUnprocessableEntity, "error input", "Email checking is failed", validationInput)
 		c.JSON(http.StatusUnprocessableEntity, &response)
 		return
 	}
@@ -65,7 +66,7 @@ func (contr *UserControllerImpl) CheckEmailAvailable(c *gin.Context) {
 		"is_available": emailAvailable,
 	}
 
-	resp := helper.WriteToResponseBody(
+	resp := formatter.WriteToResponseBody(
 		200,
 		"success",
 		message,
@@ -80,8 +81,8 @@ func (contr *UserControllerImpl) RegisterUser(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&user)
 	if err != nil {
-		validationInput := helper.ErrorValidationInput(err, c)
-		response := helper.WriteToResponseBody(http.StatusUnprocessableEntity, "error input", "Register account failed", validationInput)
+		validationInput := helper.ErrorValidationInput(err)
+		response := formatter.WriteToResponseBody(http.StatusUnprocessableEntity, "error input", "Register account failed", validationInput)
 		c.JSON(http.StatusUnprocessableEntity, &response)
 		return
 	}
@@ -95,9 +96,9 @@ func (contr *UserControllerImpl) RegisterUser(c *gin.Context) {
 	token, err := contr.JWTAuth.GenerateToken(registerUser.Id)
 	helper.PanicIfError(err)
 
-	userResponse := helper.UserResponseAPI(registerUser, token)
+	userResponse := formatter.UserResponseAPI(registerUser, token)
 
-	apiResponse := helper.WriteToResponseBody(
+	apiResponse := formatter.WriteToResponseBody(
 		200,
 		"success",
 		"Account has been registered",
@@ -111,8 +112,8 @@ func (contr *UserControllerImpl) LoginUser(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&login)
 	if err != nil {
-		validationInput := helper.ErrorValidationInput(err, c)
-		response := helper.WriteToResponseBody(http.StatusUnprocessableEntity, "error input", "Login is failed", validationInput)
+		validationInput := helper.ErrorValidationInput(err)
+		response := formatter.WriteToResponseBody(http.StatusUnprocessableEntity, "error input", "Login is failed", validationInput)
 		c.JSON(http.StatusUnprocessableEntity, &response)
 		return
 	}
@@ -126,8 +127,8 @@ func (contr *UserControllerImpl) LoginUser(c *gin.Context) {
 	token, err := contr.JWTAuth.GenerateToken(user.Id)
 	helper.PanicIfError(err)
 
-	userResponse := helper.UserResponseAPI(user, token)
-	response := helper.WriteToResponseBody(
+	userResponse := formatter.UserResponseAPI(user, token)
+	response := formatter.WriteToResponseBody(
 		200,
 		"success",
 		"Login successfully",

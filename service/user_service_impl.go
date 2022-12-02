@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"go-campaign-app/formatter"
 	"go-campaign-app/helper"
 	"go-campaign-app/model/domain"
 	"go-campaign-app/model/web"
@@ -19,19 +20,19 @@ func (service *UserServiceImpl) FindById(id int) (web.UserFiltered, error) {
 	user, err := service.UserRepository.FindById(service.DB, id)
 	helper.UserServiceError(err)
 
-	return helper.UserFiltered(&user), nil
+	return formatter.UserFiltered(&user), nil
 }
 
 func (service *UserServiceImpl) UploadAvatar(fileName string, id int) (web.UserFiltered, error) {
 	user, err := service.UserRepository.FindById(service.DB, id)
 	helper.UserServiceError(err)
 
-	user.AvatarFileName.String = fileName
+	user.AvatarFileName = fileName
 
 	avatar, err := service.UserRepository.UploadAvatar(service.DB, user)
 	helper.UserServiceError(err)
 
-	return helper.UserFiltered(&avatar), nil
+	return formatter.UserFiltered(&avatar), nil
 }
 
 func (service *UserServiceImpl) CheckEmailAvailable(available web.CheckEmailAvailable) (bool, error) {
@@ -58,7 +59,7 @@ func (service *UserServiceImpl) RegisterUser(user web.RegisterUser) (web.UserFil
 	save, err := service.UserRepository.Save(service.DB, userRepo)
 	helper.UserServiceError(err)
 
-	return helper.UserFiltered(&save), nil
+	return formatter.UserFiltered(&save), nil
 }
 
 func (service *UserServiceImpl) LoginUser(user web.LoginUser) (web.UserFiltered, error) {
@@ -77,7 +78,7 @@ func (service *UserServiceImpl) LoginUser(user web.LoginUser) (web.UserFiltered,
 		return web.UserFiltered{}, errors.New("Your password is incorrect")
 	}
 
-	return helper.UserFiltered(&findByEmail), nil
+	return formatter.UserFiltered(&findByEmail), nil
 }
 
 func NewUserService(campaignRepository repository.UserRepository, DB *gorm.DB) UserService {

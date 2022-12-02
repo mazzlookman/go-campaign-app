@@ -1,4 +1,4 @@
-package helper
+package formatter
 
 import (
 	"go-campaign-app/model/web"

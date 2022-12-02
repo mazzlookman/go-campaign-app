@@ -2,8 +2,11 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-campaign-app/formatter"
 	"go-campaign-app/helper"
+	"go-campaign-app/model/web"
 	"go-campaign-app/service"
+	"net/http"
 	"strconv"
 )
 
@@ -11,20 +14,48 @@ type CampaignControllerImpl struct {
 	service.CampaignService
 }
 
-func (contr *CampaignControllerImpl) FindCampaigns(c *gin.Context) {
-	userId, _ := strconv.Atoi(c.Query("user_id"))
-	campaigns, err := contr.CampaignService.FindCampaigns(userId)
+func (contr *CampaignControllerImpl) FindCampaignById(ctx *gin.Context) {
+	input := web.FindCampaignById{}
+	err := ctx.ShouldBindUri(&input)
 	if err != nil {
-		helper.ErrorService(err, c)
+		apiResponse := formatter.WriteToResponseBody(
+			http.StatusUnprocessableEntity,
+			"error",
+			"could't mapping uri input to struct",
+			nil,
+		)
+		ctx.JSON(http.StatusUnprocessableEntity, &apiResponse)
 		return
 	}
-	apiResponse := helper.WriteToResponseBody(
+
+	campaign, err := contr.CampaignService.FindCampaignById(input)
+	if err != nil {
+		helper.ErrorService(err, ctx)
+		return
+	}
+	apiResponse := formatter.WriteToResponseBody(
+		200,
+		"success",
+		"campaign detail",
+		formatter.CampaignDetailFormatter(&campaign),
+	)
+	ctx.JSON(200, &apiResponse)
+}
+
+func (contr *CampaignControllerImpl) FindCampaigns(ctx *gin.Context) {
+	userId, _ := strconv.Atoi(ctx.Query("user_id"))
+	campaigns, err := contr.CampaignService.FindCampaigns(userId)
+	if err != nil {
+		helper.ErrorService(err, ctx)
+		return
+	}
+	apiResponse := formatter.WriteToResponseBody(
 		200,
 		"success",
 		"List of campaigns",
-		helper.CampaignsResponseFormatter(campaigns),
+		formatter.CampaignsResponseFormatter(campaigns),
 	)
-	c.JSON(200, &apiResponse)
+	ctx.JSON(200, &apiResponse)
 }
 
 func NewCampaignControllerImpl(campaignService service.CampaignService) *CampaignControllerImpl {

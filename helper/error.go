@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"go-campaign-app/formatter"
 	"net/http"
 )
 
@@ -37,7 +38,7 @@ func PanicIfError(err error) {
 	}
 }
 
-func ErrorValidationInput(err error, c *gin.Context) *gin.H {
+func ErrorValidationInput(err error) *gin.H {
 	var errors []string
 
 	for _, fieldError := range err.(validator.ValidationErrors) {
@@ -50,17 +51,17 @@ func ErrorValidationInput(err error, c *gin.Context) *gin.H {
 }
 
 func ErrorService(err error, c *gin.Context) {
-	response := WriteToResponseBody(http.StatusInternalServerError, "INTERNAL SERVER ERROR", "Ups sorry", err.Error())
+	response := formatter.WriteToResponseBody(http.StatusInternalServerError, "INTERNAL SERVER ERROR", "Ups sorry", err.Error())
 	c.JSON(http.StatusInternalServerError, &response)
 }
 
 func ErrorUploadAvatar(err error, c *gin.Context, code int) {
 	data := gin.H{"is_uploaded": false}
-	response := WriteToResponseBody(code, "error", "Upload avatar is failed", data)
+	response := formatter.WriteToResponseBody(code, "error", "Upload avatar is failed", data)
 	c.JSON(code, &response)
 }
 
 func ErrorUnauthorized(c *gin.Context, code int) {
-	response := WriteToResponseBody(code, "error", "UNAUTHORIZED", nil)
+	response := formatter.WriteToResponseBody(code, "error", "UNAUTHORIZED", nil)
 	c.AbortWithStatusJSON(code, &response)
 }
