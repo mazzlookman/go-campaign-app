@@ -9,6 +9,13 @@ import (
 type CampaignRepositoryImpl struct {
 }
 
+func (repo *CampaignRepositoryImpl) Save(db *gorm.DB, campaign domain.Campaign) (domain.Campaign, error) {
+	err := db.Create(&campaign).Error
+	helper.CampaignRepositoryError(err)
+
+	return campaign, nil
+}
+
 func (repo *CampaignRepositoryImpl) FindById(db *gorm.DB, id int) (domain.Campaign, error) {
 	camp := domain.Campaign{}
 	err := db.Preload("User").

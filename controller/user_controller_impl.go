@@ -96,7 +96,7 @@ func (contr *UserControllerImpl) RegisterUser(c *gin.Context) {
 	token, err := contr.JWTAuth.GenerateToken(registerUser.Id)
 	helper.PanicIfError(err)
 
-	userResponse := formatter.UserResponseAPI(registerUser, token)
+	userResponse := formatter.UserRegisterOrLogin(registerUser, token)
 
 	apiResponse := formatter.WriteToResponseBody(
 		200,
@@ -127,7 +127,7 @@ func (contr *UserControllerImpl) LoginUser(c *gin.Context) {
 	token, err := contr.JWTAuth.GenerateToken(user.Id)
 	helper.PanicIfError(err)
 
-	userResponse := formatter.UserResponseAPI(user, token)
+	userResponse := formatter.UserRegisterOrLogin(user, token)
 	response := formatter.WriteToResponseBody(
 		200,
 		"success",

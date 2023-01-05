@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+	"github.com/gosimple/slug"
 	"go-campaign-app/helper"
 	"go-campaign-app/model/domain"
 	"go-campaign-app/model/web"
@@ -11,6 +13,24 @@ import (
 type CampaignServiceImpl struct {
 	repository.CampaignRepository
 	*gorm.DB
+}
+
+func (c *CampaignServiceImpl) CreateCampaign(input web.CreateCampaignInput) (domain.Campaign, error) {
+	camp := domain.Campaign{}
+	camp.Name = input.Name
+	camp.Summary = input.ShortDescription
+	camp.Description = input.Description
+	camp.GoalAmount = input.GoalAmount
+	camp.Perks = input.Perks
+	camp.UserId = input.UserId
+
+	slugCandidate := fmt.Sprintf("%s %d", input.Name, input.UserId)
+	camp.Slug = slug.Make(slugCandidate)
+
+	campaign, err := c.CampaignRepository.Save(c.DB, camp)
+	helper.CampaignServiceError(err)
+
+	return campaign, nil
 }
 
 func (c *CampaignServiceImpl) FindCampaignById(id web.FindCampaignById) (domain.Campaign, error) {

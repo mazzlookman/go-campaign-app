@@ -18,14 +18,3 @@ func WriteToResponseBody(code int, st string, msg string, data interface{}) web.
 
 	return resp
 }
-
-func UserResponseAPI(user web.UserFiltered, token string) web.RegisterOrLoginUserResponse {
-	resp := web.RegisterOrLoginUserResponse{
-		Id:         user.Id,
-		Name:       user.Name,
-		Occupation: user.Occupation,
-		Email:      user.Email,
-		Token:      token,
-	}
-	return resp
-}

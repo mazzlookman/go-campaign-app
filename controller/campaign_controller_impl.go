@@ -14,6 +14,35 @@ type CampaignControllerImpl struct {
 	service.CampaignService
 }
 
+func (contr *CampaignControllerImpl) CreateCampaign(ctx *gin.Context) {
+	input := web.CreateCampaignInput{}
+	err := ctx.ShouldBindJSON(&input)
+	if err != nil {
+		apiResponse := formatter.WriteToResponseBody(
+			http.StatusUnprocessableEntity,
+			"error",
+			"could't mapping json input to struct",
+			err.Error(),
+		)
+		ctx.JSON(http.StatusUnprocessableEntity, &apiResponse)
+	}
+
+	userId := ctx.MustGet("currentUser").(int)
+	input.UserId = userId
+
+	createCampaign, err := contr.CampaignService.CreateCampaign(input)
+	if err != nil {
+		helper.CampaignServiceError(err)
+	}
+	apiResponse := formatter.WriteToResponseBody(
+		200,
+		"success",
+		"campaign has been created",
+		formatter.CampaignResponseFormatter(&createCampaign),
+	)
+	ctx.JSON(200, &apiResponse)
+}
+
 func (contr *CampaignControllerImpl) FindCampaignById(ctx *gin.Context) {
 	input := web.FindCampaignById{}
 	err := ctx.ShouldBindUri(&input)

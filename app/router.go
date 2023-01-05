@@ -36,6 +36,7 @@ func NewRouter() *gin.Engine {
 	//Campaign endpoint
 	api.GET("/campaigns", contrCampaign.FindCampaigns)
 	api.GET("/campaigns/:campaignId", contrCampaign.FindCampaignById)
+	api.POST("/campaigns", jwtAuthMiddleware, contrCampaign.CreateCampaign)
 
 	return router
 }

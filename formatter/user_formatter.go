@@ -16,3 +16,14 @@ func UserFiltered(user *domain.User) web.UserFiltered {
 
 	return uf
 }
+
+func UserRegisterOrLogin(user web.UserFiltered, token string) web.RegisterOrLoginUserResponse {
+	resp := web.RegisterOrLoginUserResponse{
+		Id:         user.Id,
+		Name:       user.Name,
+		Occupation: user.Occupation,
+		Email:      user.Email,
+		Token:      token,
+	}
+	return resp
+}
