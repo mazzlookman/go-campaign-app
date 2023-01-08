@@ -9,6 +9,13 @@ import (
 type CampaignRepositoryImpl struct {
 }
 
+func (repo *CampaignRepositoryImpl) Update(db *gorm.DB, campaign domain.Campaign) (domain.Campaign, error) {
+	err := db.Save(&campaign).Error
+	helper.CampaignRepositoryError(err)
+
+	return campaign, nil
+}
+
 func (repo *CampaignRepositoryImpl) Save(db *gorm.DB, campaign domain.Campaign) (domain.Campaign, error) {
 	err := db.Create(&campaign).Error
 	helper.CampaignRepositoryError(err)

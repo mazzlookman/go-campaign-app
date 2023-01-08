@@ -9,4 +9,5 @@ type CampaignService interface {
 	FindCampaigns(userId int) ([]domain.Campaign, error)
 	FindCampaignById(id web.FindCampaignById) (domain.Campaign, error)
 	CreateCampaign(input web.CreateCampaignInput) (domain.Campaign, error)
+	UpdateCampaign(id web.FindCampaignById, input web.CreateCampaignInput) (domain.Campaign, error)
 }

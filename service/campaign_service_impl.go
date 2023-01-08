@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gosimple/slug"
 	"go-campaign-app/helper"
@@ -13,6 +14,26 @@ import (
 type CampaignServiceImpl struct {
 	repository.CampaignRepository
 	*gorm.DB
+}
+
+func (c *CampaignServiceImpl) UpdateCampaign(id web.FindCampaignById, input web.CreateCampaignInput) (domain.Campaign, error) {
+	findById, err := c.CampaignRepository.FindById(c.DB, id.Id)
+	helper.CampaignServiceError(err)
+
+	if findById.UserId != input.UserId {
+		return findById, errors.New("Not an owner of the campaign")
+	}
+
+	findById.Name = input.Name
+	findById.Summary = input.ShortDescription
+	findById.Description = input.Description
+	findById.GoalAmount = input.GoalAmount
+	findById.Perks = input.Perks
+
+	update, err := c.CampaignRepository.Update(c.DB, findById)
+	helper.CampaignServiceError(err)
+
+	return update, nil
 }
 
 func (c *CampaignServiceImpl) CreateCampaign(input web.CreateCampaignInput) (domain.Campaign, error) {
